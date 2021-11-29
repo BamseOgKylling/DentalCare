@@ -13,7 +13,8 @@ namespace DentalCare
             do
             {
                 WriteLine("1. Register patient");
-                WriteLine("2. Exit");
+                WriteLine("2. Search Patient");
+                WriteLine("3. Exit");
 
                 CursorVisible = false;
 
@@ -25,7 +26,8 @@ namespace DentalCare
                     input = ReadKey(true);
 
                     invalidChoice = !(input.Key == ConsoleKey.D1 || input.Key == ConsoleKey.NumPad1
-                        || input.Key == ConsoleKey.D2 || input.Key == ConsoleKey.NumPad2);
+                        || input.Key == ConsoleKey.D2 || input.Key == ConsoleKey.NumPad2
+                        || input.Key == ConsoleKey.D3 || input.Key == ConsoleKey.NumPad3);
 
                 } while (invalidChoice);
 
@@ -36,12 +38,21 @@ namespace DentalCare
                 switch (input.Key)
                 {
                     case ConsoleKey.D1:
+                    case ConsoleKey.NumPad1:
 
                         RegisterPatient();
 
                         break;
 
                     case ConsoleKey.D2:
+                    case ConsoleKey.NumPad2:
+
+                        SearchPatient();
+
+                        break;
+
+                    case ConsoleKey.D3:
+                    case ConsoleKey.NumPad3:
 
                         applicationRunning = false;
 
@@ -52,6 +63,39 @@ namespace DentalCare
 
             } while (applicationRunning);
 
+        }
+
+        private static void SearchPatient()
+        {
+            Write("Patient (SSN): ");
+
+            string sSN = ReadLine();
+
+            Clear();
+
+            var patient = FindPatient(sSN);
+
+            if (patient == null)
+            {
+                Notify("Patient not found");
+                return;
+            }
+
+            WriteLine(patient.FullName);
+            WriteLine(patient.SSN);
+
+            while (ReadKey(true).Key != ConsoleKey.Escape);
+
+
+        }
+
+        private static Patient? FindPatient(string sSN)
+        {
+            using var context = new DentalCareContext();
+
+            var patient = context.Patients.FirstOrDefault(x => x.SSN == sSN);
+
+            return patient;
         }
 
         private static void RegisterPatient()

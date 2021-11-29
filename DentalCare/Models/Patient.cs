@@ -15,6 +15,8 @@ namespace DentalCare.Models
         [MaxLength(13)]
         public string SSN { get; protected set; }
 
+        public string FullName => $"{FirstName} {LastName}";
+
 
 
         public Patient(string firstName, string lastName, string sSN)
