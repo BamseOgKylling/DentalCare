@@ -14,7 +14,8 @@ namespace DentalCare
             {
                 WriteLine("1. Register patient");
                 WriteLine("2. Search Patient");
-                WriteLine("3. Exit");
+                WriteLine("3. Register Appointment");
+                WriteLine("4. Exit");
 
                 CursorVisible = false;
 
@@ -27,7 +28,8 @@ namespace DentalCare
 
                     invalidChoice = !(input.Key == ConsoleKey.D1 || input.Key == ConsoleKey.NumPad1
                         || input.Key == ConsoleKey.D2 || input.Key == ConsoleKey.NumPad2
-                        || input.Key == ConsoleKey.D3 || input.Key == ConsoleKey.NumPad3);
+                        || input.Key == ConsoleKey.D3 || input.Key == ConsoleKey.NumPad3
+                        || input.Key == ConsoleKey.D4 || input.Key == ConsoleKey.NumPad4);
 
                 } while (invalidChoice);
 
@@ -54,6 +56,13 @@ namespace DentalCare
                     case ConsoleKey.D3:
                     case ConsoleKey.NumPad3:
 
+                        RegisterAppointment();
+
+                        break;
+
+                    case ConsoleKey.D4:
+                    case ConsoleKey.NumPad4:
+
                         applicationRunning = false;
 
                         break;
@@ -63,6 +72,49 @@ namespace DentalCare
 
             } while (applicationRunning);
 
+        }
+
+        private static void RegisterAppointment()
+        {
+            Write("SSN: ");
+
+            string sSN = ReadLine();
+
+            Clear();
+
+            var patient = FindPatient(sSN);
+
+            if (patient == null)
+            {
+                Notify("Patient not found");
+                return;
+            }
+
+            WriteLine($"{patient.FullName} {patient.SSN}");
+
+            WriteLine("----------------------------------------------------------");
+
+            Write("Date: ");
+
+            DateTime date = DateTime.Parse(ReadLine());
+
+            var appointment = new Appointment(patient, date);
+
+            SaveAppointment(appointment);
+
+            Notify("Appointment registered");
+
+        }
+
+        private static void SaveAppointment(Appointment appointment)
+        {
+            using var context = new DentalCareContext();
+
+            context.Patients.Attach(appointment.Patient);
+
+            context.Appointments.Add(appointment);
+
+            context.SaveChanges();
         }
 
         private static void SearchPatient()
