@@ -1,5 +1,6 @@
 ﻿using DentalCare.Data;
 using DentalCare.Models;
+using Microsoft.EntityFrameworkCore;
 using static System.Console;
 namespace DentalCare
 {
@@ -15,7 +16,8 @@ namespace DentalCare
                 WriteLine("1. Register patient");
                 WriteLine("2. Search Patient");
                 WriteLine("3. Register Appointment");
-                WriteLine("4. Exit");
+                WriteLine("4. List Appointments");
+                WriteLine("5. Exit");
 
                 CursorVisible = false;
 
@@ -29,7 +31,8 @@ namespace DentalCare
                     invalidChoice = !(input.Key == ConsoleKey.D1 || input.Key == ConsoleKey.NumPad1
                         || input.Key == ConsoleKey.D2 || input.Key == ConsoleKey.NumPad2
                         || input.Key == ConsoleKey.D3 || input.Key == ConsoleKey.NumPad3
-                        || input.Key == ConsoleKey.D4 || input.Key == ConsoleKey.NumPad4);
+                        || input.Key == ConsoleKey.D4 || input.Key == ConsoleKey.NumPad4
+                        || input.Key == ConsoleKey.D5 || input.Key == ConsoleKey.NumPad5);
 
                 } while (invalidChoice);
 
@@ -63,6 +66,13 @@ namespace DentalCare
                     case ConsoleKey.D4:
                     case ConsoleKey.NumPad4:
 
+                        ListAppointments();
+
+                        break;
+
+                    case ConsoleKey.D5:
+                    case ConsoleKey.NumPad5:
+
                         applicationRunning = false;
 
                         break;
@@ -72,6 +82,36 @@ namespace DentalCare
 
             } while (applicationRunning);
 
+        }
+
+        private static void ListAppointments()
+        {
+            Write("Date: ");
+
+            DateTime date = DateTime.Parse(ReadLine());
+
+            var appointments = FindAppointmentsByDate(date);
+
+            foreach (var appointment in appointments)
+            {
+                WriteLine($"{appointment.Date.ToShortTimeString()}  {appointment.Patient.FullName}");
+            }
+
+            ReadKey(true);
+        }
+
+        private static IEnumerable<Appointment> FindAppointmentsByDate(DateTime date)
+        {
+            using var context = new DentalCareContext();
+
+            var query = context.Appointments.Include(x => x.Patient).Where(x => x.Date.Date == date.Date);
+
+            //return context.Appointments
+            //    .Include(x => x.Patient)
+            //    .Where(x => x.Date.Date == date.Date)
+            //    .ToList();
+
+            return query.ToList();
         }
 
         private static void RegisterAppointment()
