@@ -86,8 +86,23 @@ namespace DentalCare
 
             if (patient == null)
             {
-                Notify("Patient not found");
-                return;
+                Write("First Name: ");
+
+                string firstName = ReadLine();
+
+
+                Write("Last name: ");
+
+                string lastName = ReadLine();
+
+
+                Write("SSN: ");
+
+                sSN = ReadLine();
+
+               patient = new Patient(firstName, lastName, sSN);
+
+                Clear();
             }
 
             WriteLine($"{patient.FullName} {patient.SSN}");
@@ -110,8 +125,11 @@ namespace DentalCare
         {
             using var context = new DentalCareContext();
 
-            context.Patients.Attach(appointment.Patient);
-
+            if (appointment.Patient.Id !=0)
+            {
+                context.Patients.Attach(appointment.Patient);
+            }
+            
             context.Appointments.Add(appointment);
 
             context.SaveChanges();
